@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>发送邮件</title>
+    <link rel="stylesheet" href="Senderstyles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>发送邮件</h1>
+        <form id="emailForm" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="to" class="floating-label">收件人：</label>
+                <input type="email" id="to" name="to" required class="underline-input">
+            </div>
+            <div class="form-group">
+                <label for="subject" class="floating-label">主题：</label>
+                <input type="text" id="subject" name="subject" required class="underline-input">
+            </div>
+            <div class="form-group">
+                <label for="attachments">附件：</label>
+                <input type="file" id="attachments" name="attachments" multiple>
+            </div>
+            <div class="form-group">
+                <label for="text" class="floating-label"></label>
+                <textarea id="text" name="text" rows="10"></textarea>
+            </div>
+            <button type="submit">发送邮件</button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('emailForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const formData = new FormData(document.getElementById('emailForm'));
+            const response = await fetch('/send-email', {
+                method: 'POST',
+                body: formData
+            });
+            const result = await response.json();
+            alert(result.message);
+        });
+    </script>
+</body>
+</html>

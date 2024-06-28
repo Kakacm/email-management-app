@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Email Reader</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    .email-item {
+      cursor: pointer;
+      margin: 5px 0;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+    .email-item:hover {
+      background-color: #f0f0f0;
+    }
+    .email-details {
+      margin-top: 20px;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Email Reader</h1>
+  <div id="email-list"></div>
+  <div id="email-details" class="email-details"></div>
+
+  <script>
+    async function fetchEmails() {
+      const response = await fetch('/emails');
+      const emails = await response.json();
+      const emailList = document.getElementById('email-list');
+      emailList.innerHTML = '';
+
+      emails.forEach(email => {
+        const emailItem = document.createElement('div');
+        emailItem.className = 'email-item';
+        emailItem.innerHTML = `<strong>${email.subject}</strong> - ${email.from} (${new Date(email.date).toLocaleString()})`;
+        emailItem.onclick = () => fetchEmailDetails(email.id);
+        emailList.appendChild(emailItem);
+      });
+    }
+
+    async function fetchEmailDetails(id) {
+      const response = await fetch(`/email/${id}`);
+      const email = await response.json();
+      const emailDetails = document.getElementById('email-details');
+      emailDetails.innerHTML = `
+        <h2>${email.subject}</h2>
+        <p><strong>From:</strong> ${email.from}</p>
+        <p><strong>Date:</strong> ${new Date(email.date).toLocaleString()}</p>
+        <div>${email.html}</div>
+        <div>${email.text}</div>
+      `;
+    }
+
+    fetchEmails();
+  </script>
+</body>
+</html>
