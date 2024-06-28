@@ -98,6 +98,28 @@ app.get('/email/:id', async (req, res) => {
     res.status(500).send(err.message);
   }
 });
+app.delete('/email/:id', async (req, res) => {
+  try {
+    const emailId = req.params.id;
+    const connection = await Imap.connect(config);
+    await connection.openBox('INBOX');
+    console.log(`Connected and INBOX opened for deleting email with ID: ${emailId}`);
+
+    await connection.addFlags(emailId, '\\Deleted');
+    console.log(`Email with ID: ${emailId} marked as deleted`);
+
+    await connection.imap.expunge();
+    console.log(`Email with ID: ${emailId} expunged`);
+
+    await connection.closeBox(true);
+    await connection.end();
+    res.send('Email deleted');
+  } catch (err) {
+    console.error('Error deleting email:', err.message);
+    res.status(500).send(err.message);
+  }
+});
+
 
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);

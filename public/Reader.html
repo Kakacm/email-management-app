@@ -10,6 +10,9 @@
       margin: 20px;
     }
     .email-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       cursor: pointer;
       margin: 5px 0;
       padding: 10px;
@@ -24,6 +27,17 @@
       padding: 10px;
       border: 1px solid #ddd;
       border-radius: 5px;
+    }
+    .delete-button {
+      background-color: red;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+    .delete-button:hover {
+      background-color: darkred;
     }
   </style>
 </head>
@@ -42,8 +56,12 @@
       emails.forEach(email => {
         const emailItem = document.createElement('div');
         emailItem.className = 'email-item';
-        emailItem.innerHTML = `<strong>${email.subject}</strong> - ${email.from} (${new Date(email.date).toLocaleString()})`;
-        emailItem.onclick = () => fetchEmailDetails(email.id);
+        emailItem.innerHTML = `
+          <div onclick="fetchEmailDetails(${email.id})">
+            <strong>${email.subject}</strong> - ${email.from} (${new Date(email.date).toLocaleString()})
+          </div>
+          <button class="delete-button" onclick="deleteEmail(${email.id})">删除</button>
+        `;
         emailList.appendChild(emailItem);
       });
     }
@@ -59,6 +77,18 @@
         <div>${email.html}</div>
         <div>${email.text}</div>
       `;
+    }
+
+    async function deleteEmail(id) {
+      if (confirm('确定要删除这封邮件吗？')) {
+        const response = await fetch(`/email/${id}`, { method: 'DELETE' });
+        if (response.ok) {
+          alert('邮件已删除');
+          fetchEmails();
+        } else {
+          alert('删除邮件时出错');
+        }
+      }
     }
 
     fetchEmails();
